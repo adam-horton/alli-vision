@@ -6,7 +6,7 @@ from flask import Response
 from flask import Flask
 from flask import render_template
 
-HOST = '100.65.29.50' #FIXME
+HOST = '0.0.0.0'
 PORT = '8000'
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-        return Response(capture_and_detect, mimetype = 'multipart/x-mixed-replace; boundary=frame')
+        return Response(capture_and_detect(), mimetype = 'multipart/x-mixed-replace; boundary=frame')
 
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
@@ -26,7 +26,7 @@ def capture_and_detect():
 
         cap = cv2.VideoCapture(0)
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-                while cap.isOpened():
+                while True:
                         #Read in one frame
                         ret, frame = cap.read()
 
@@ -44,7 +44,7 @@ def capture_and_detect():
                                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
                         
                         #Send the frame to the live stream
-                        encodedImage = cv2.imencode('.jpg', image)
+                        encodedImage = cv2.imencode('.jpg', image)[1]
                         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
                         
                         #Display the image on the screen
