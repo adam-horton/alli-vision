@@ -46,9 +46,6 @@ def capture_and_detect():
                         #Send the frame to the live stream
                         encodedImage = cv2.imencode('.jpg', image)[1]
                         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
-                        
-                        #Display the image on the screen
-                        cv2.imshow('Mediapipe Feed', image)
 
                         #Wait 1ms, if q is pressed, quit
                         if cv2.waitKey(1) & 0xFF == ord('q'):
