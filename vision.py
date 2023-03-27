@@ -2,12 +2,12 @@
 import mediapipe as mp
 import numpy as np
 import cv2
-from flask import Response
-from flask import Flask
-from flask import render_template
+from flask import Flask, Response, render_template, request
 
 HOST = '0.0.0.0'
 PORT = '8000'
+GATOR_BLUE_BGR = (165, 33, 0)
+GATOR_ORANGE_BGR = (22, 70, 250)
 
 app = Flask(__name__)
 
@@ -19,9 +19,12 @@ def index():
 def video_feed():
         return Response(capture_and_detect(), mimetype = 'multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/status', methods=['GET'])
+def status():
+        return '<h3>Hello World</h3>'
+
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
-        mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
 
         cap = cv2.VideoCapture(0)
@@ -30,25 +33,31 @@ def capture_and_detect():
                         #Read in one frame
                         ret, frame = cap.read()
 
-                        #Use mediapipe to compute and draw overlay
+                        #Use mediapipe pose to process the image and determine landmarks
                         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         image.flags.writeable = False
                         results = pose.process(image)
                         image.flags.writeable = True
                         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+                        try:
+                                landmarks = results.pose_landmarks.landmark
+                                #FIXME
+                        except:
+                                pass
+
+                        #Draw the landmarks on the image
                         mp_drawing.draw_landmarks(
                                 image,
                                 results.pose_landmarks,
                                 mp_pose.POSE_CONNECTIONS,
-                                landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+                                mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
+                                mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
+                                )
                         
                         #Send the frame to the live stream
                         encodedImage = cv2.imencode('.jpg', image)[1]
                         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
-
-        cap.release()
-        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
         app.run(host=HOST, port=PORT, debug=True, use_reloader=False)
