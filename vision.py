@@ -9,6 +9,8 @@ PORT = '8000'
 GATOR_BLUE_BGR = (165, 33, 0)
 GATOR_ORANGE_BGR = (22, 70, 250)
 
+status = 'N/A'
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -21,7 +23,7 @@ def video_feed():
 
 @app.route('/status', methods=['GET'])
 def status():
-        return '<h3>Hello World</h3>'
+        return status
 
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
@@ -42,7 +44,7 @@ def capture_and_detect():
 
                         try:
                                 landmarks = results.pose_landmarks.landmark
-                                #FIXME
+                                update_status(landmarks)
                         except:
                                 pass
 
@@ -58,6 +60,16 @@ def capture_and_detect():
                         #Send the frame to the live stream
                         encodedImage = cv2.imencode('.jpg', image)[1]
                         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+
+def update_status(landmarks):
+        global status
+        mp_pose = mp.solutions.pose
+
+        if landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y > landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y:
+                status = 'Hand Raised'
+        else:
+                status = 'N/A'
+
 
 if __name__ == "__main__":
         app.run(host=HOST, port=PORT, debug=True, use_reloader=False)
