@@ -8,7 +8,11 @@
     <div>Status:</div>
     <h3 id="status"></h3>
     <script>
-      var interval = setInterval(function(){$("#status").load("/status")}, 3000)
+      function loadStatus(){
+        $("#status").load("/status")
+      }
+      loadStatus();
+      setInterval(loadStatus, 3000);
     </script>
   </body>
 </html>
