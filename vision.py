@@ -9,13 +9,13 @@ PORT = '8000'
 GATOR_BLUE_BGR = (165, 33, 0)
 GATOR_ORANGE_BGR = (22, 70, 250)
 
-status = 'Not Initialized'
+hand_status = 'Not Initialized'
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-        return render_template('index.html', status=status)
+        return render_template('index.html', status=hand_status)
 
 @app.route('/video_feed')
 def video_feed():
@@ -23,7 +23,7 @@ def video_feed():
 
 @app.route('/status', methods=['GET'])
 def status():
-        return status
+        return hand_status
 
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
@@ -62,15 +62,15 @@ def capture_and_detect():
                         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 def update_status(landmarks):
-        global status
+        global hand_status
         mp_landmark = mp.solutions.pose.PoseLandmark
 
         if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
-                status = 'Left Hand Raised'
+                hand_status = 'Left Hand Raised'
         elif landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
-                status = 'Right Hand Raised'
+                hand_status = 'Right Hand Raised'
         else:
-                status = 'Neither Hand Raised'
+                hand_status = 'Neither Hand Raised'
 
 
 if __name__ == "__main__":
