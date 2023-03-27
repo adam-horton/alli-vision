@@ -9,7 +9,7 @@ PORT = '8000'
 GATOR_BLUE_BGR = (165, 33, 0)
 GATOR_ORANGE_BGR = (22, 70, 250)
 
-status = 'N/A'
+status = 'Not Initialized'
 
 app = Flask(__name__)
 
@@ -63,12 +63,14 @@ def capture_and_detect():
 
 def update_status(landmarks):
         global status
-        mp_pose = mp.solutions.pose
+        mp_landmark = mp.solutions.pose.PoseLandmark
 
-        if landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y > landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y:
-                status = 'Hand Raised'
+        if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
+                status = 'Left Hand Raised'
+        elif landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
+                status = 'Right Hand Raised'
         else:
-                status = 'N/A'
+                status = 'Neither Hand Raised'
 
 
 if __name__ == "__main__":
