@@ -65,7 +65,9 @@ def update_status(landmarks):
         global hand_status
         mp_landmark = mp.solutions.pose.PoseLandmark
 
-        if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
+        if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y and landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
+                hand_satus = 'Both Hands Raised'
+        elif landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
                 hand_status = 'Left Hand Raised'
         elif landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
                 hand_status = 'Right Hand Raised'

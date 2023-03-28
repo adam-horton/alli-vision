@@ -11,8 +11,7 @@
         const post = await fetch(window.location.href + "/status").then((res) => res.json());
         document.getElementById("status").innerText = post.status;
       }
-      getStatus();
-      setInterval(getStatus(), 3000)
+      window.setInterval(function(){getStatus();}, 1000);
     </script>
   </body>
 </html>
