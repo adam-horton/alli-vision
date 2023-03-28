@@ -5,6 +5,14 @@
   <body>
     <h1>Alli Video Feed</h1>
     <img src="{{ url_for('video_feed') }}">
-    <div>Status:</div>
+    <div>Status: <span id="status"></span></div>
+    <script>
+      async function getStatus() {
+        const post = await fetch(window.location.href + "/status").then((res) => res.json());
+        document.getElementById("status").innerText = post.status;
+      }
+      getStatus();
+      setInterval(getStatus(), 3000)
+    </script>
   </body>
 </html>

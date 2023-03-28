@@ -2,7 +2,7 @@
 import mediapipe as mp
 import numpy as np
 import cv2
-from flask import Flask, Response, render_template, request
+from flask import Flask, Response, render_template, jsonify
 
 HOST = '0.0.0.0'
 PORT = '8000'
@@ -23,7 +23,7 @@ def video_feed():
 
 @app.route('/status', methods=['GET'])
 def status():
-        return hand_status
+        return jsonify({"status": hand_status})
 
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
