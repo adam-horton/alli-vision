@@ -9,7 +9,10 @@ PORT = '8000'
 GATOR_BLUE_BGR = (165, 33, 0)
 GATOR_ORANGE_BGR = (22, 70, 250)
 
-hand_status = 'Not Initialized'
+hand_status = {
+                "RIGHT_HAND_RAISED" : False,
+                "LEFT_HAND_RAISED" : False,
+        }
 
 app = Flask(__name__)
 
@@ -23,7 +26,15 @@ def video_feed():
 
 @app.route('/status', methods=['GET'])
 def status():
-        return jsonify({"status": hand_status})
+        if hand_status["LEFT_HAND_RAISED"] and hand_status["RIGHT_HAND_RAISED"]:
+                status_text = 'Both Hands Raised'
+        elif hand_status["LEFT_HAND_RAISED"] and not hand_status["RIGHT_HAND_RAISED"]:
+                status_text = 'Left Hand Raised'
+        elif not hand_status["LEFT_HAND_RAISED"] and hand_status["RIGHT_HAND_RAISED"]:
+                status_text = 'Right Hand Raised'
+        else:
+                status_text = 'No Hands Raised'
+        return jsonify({"status": status_text})
 
 def capture_and_detect():
         mp_drawing = mp.solutions.drawing_utils
@@ -65,14 +76,15 @@ def update_status(landmarks):
         global hand_status
         mp_landmark = mp.solutions.pose.PoseLandmark
 
-        if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y and landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
-                hand_status = 'Both Hands Raised'
-        elif landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
-                hand_status = 'Left Hand Raised'
-        elif landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
-                hand_status = 'Right Hand Raised'
+        if landmarks[mp_landmark.LEFT_SHOULDER.value].y > landmarks[mp_landmark.LEFT_WRIST.value].y:
+                hand_status["LEFT_HAND_RAISED"] = True
         else:
-                hand_status = 'Neither Hand Raised'
+                hand_status["LEFT_HAND_RAISED"] = False
+
+        if landmarks[mp_landmark.RIGHT_SHOULDER.value].y > landmarks[mp_landmark.RIGHT_WRIST.value].y:
+                hand_status["RIGHT_HAND_RAISED"] = True
+        else:
+                hand_status["RIGHT_HAND_RAISED"] = False
 
 
 if __name__ == "__main__":
