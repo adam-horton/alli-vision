@@ -5,13 +5,18 @@
   <body>
     <h1>Alli Video Feed</h1>
     <img src="{{ url_for('video_feed') }}">
-    <div>Status: <span id="status"></span></div>
+    <div>Hand Status: <span id="status"></span></div>
+    <div>Chomp Status: <span id="chomp"></span></div>
     <script>
       async function getStatus() {
         const post = await fetch(window.location.href + "/status").then((res) => res.json());
         document.getElementById("status").innerText = post.status;
       }
-      window.setInterval(function(){getStatus();}, 1000);
+      async function getChomp() {
+        const post = await fetch(window.location.href + "/chomp").then((res) => res.json());
+        document.getElementById("chomp").innerText = post.status;
+      }
+      window.setInterval(function(){getStatus();getChomp();}, 1000);
     </script>
   </body>
 </html>
