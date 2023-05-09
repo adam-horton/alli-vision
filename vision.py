@@ -20,7 +20,7 @@ class VisionApp:
 		def run(self):
 			self.app.run(host=HOST, port=PORT, debug=True, use_reloader=False)
 
-		def genereate_feed(self):
+		def generate_feed(self):
 			while True:
 				frame = self.camera.get_frame()
 				yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
