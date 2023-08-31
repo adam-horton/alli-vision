@@ -59,30 +59,33 @@ class Camera:
 				#Read in one frame
 				ret, frame = cap.read()
 
-				#Use mediapipe pose to process the image and determine landmarks
+				if not ret:
+					continue
+
+				# Use mediapipe pose to process the image and determine landmarks
 				image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-				# image.flags.writeable = False
-				# results = pose.process(image)
-				# image.flags.writeable = True
-				# image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+				image.flags.writeable = False
+				results = pose.process(image)
+				image.flags.writeable = True
+				image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-				# try:
-				# 	landmarks = results.pose_landmarks.landmark
-				# 	self.update_status(landmarks)
-				# except:
-				# 	pass
+				try:
+					landmarks = results.pose_landmarks.landmark
+					self.update_status(landmarks)
+				except:
+					pass
 
-				# #Draw the landmarks on the image
-				# mp_drawing.draw_landmarks(
-				# 		image,
-				# 		results.pose_landmarks,
-				# 		mp_pose.POSE_CONNECTIONS,
-				# 		mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
-				# 		mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
-				# 		)
+				#Draw the landmarks on the image
+				mp_drawing.draw_landmarks(
+						image,
+						results.pose_landmarks,
+						mp_pose.POSE_CONNECTIONS,
+						mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
+						mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
+						)
 				
 				#Send the frame to the live stream
-				encodedImage = cv2.imencode('.jpg', image)[1]
+				encodedImage = cv2.imencode('.jpg', frame)[1]
 				yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 		cap.release()
