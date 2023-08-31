@@ -56,7 +56,8 @@ class VisionApp:
 if __name__ == '__main__':
 	if len(sys.argv) > 1 and sys.argv[1] == 'local':
 		print('Displaying feed locally')
-		# FIXME ADAM - Make function to display feed locally
+		cam = Camera()
+		cam.display_live_feed()
 	else:
 		app = VisionApp()
 		app.run()
