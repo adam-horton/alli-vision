@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from camera import Camera
 from flask import Flask, Response, render_template, jsonify
-import cv2
 import sys
 
 HOST = '0.0.0.0'
@@ -20,7 +19,10 @@ class VisionApp:
 			self.app.add_url_rule('/chomp', view_func=self.chomp)
 
 		def run(self):
-			self.app.run(host=HOST, port=PORT, use_reloader=False)	
+			self.app.run(host=HOST, port=PORT, use_reloader=False)
+
+		def local_feed(self):
+			self.camera.display_live_feed()
 
 		####################  ROUTES  ####################
 		
@@ -54,10 +56,9 @@ class VisionApp:
 
 
 if __name__ == '__main__':
+	app = VisionApp()
 	if len(sys.argv) > 1 and sys.argv[1] == 'local':
 		print('Displaying feed locally')
-		cam = Camera()
-		cam.display_live_feed()
+		app.local_feed()
 	else:
-		app = VisionApp()
 		app.run()

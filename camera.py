@@ -127,10 +127,10 @@ class Camera:
 						)
 				
 				#Show the current image
-				cv2.imshow('Frame',frame)
+				cv2.imshow('Alli Feed',image)
  
 				# Press Q on keyboard to exit
-				if cv2.waitKey(0) & 0xFF == ord('q'):
+				if cv2.waitKey(1) & 0xFF == ord('q'):
 					break
 
 		cap.release()
