@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from camera import Camera
 from flask import Flask, Response, render_template, jsonify
+from time import sleep
 
 HOST = '0.0.0.0'
 PORT = '8000'
@@ -18,12 +19,13 @@ class VisionApp:
 			self.app.add_url_rule('/chomp', view_func=self.chomp)
 
 		def run(self):
-			self.app.run(host=HOST, port=PORT, debug=True, use_reloader=False)
+			self.app.run(host=HOST, port=PORT, use_reloader=False)
 
 		def generate_feed(self):
 			while True:
 				frame = self.camera.get_frame()
-				yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
+				if frame:
+					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
 
 		####################  ROUTES  ####################
 		
