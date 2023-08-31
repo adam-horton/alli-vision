@@ -83,8 +83,7 @@ class Camera:
 					)
 			
 			#Send the frame to the live stream
-			encodedImage = cv2.imencode('.jpg', image)[1]
-			return encodedImage
+			return image
 
 	def update_status(self, landmarks):
 			mp_landmark = mp.solutions.pose.PoseLandmark

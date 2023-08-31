@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from camera import Camera
 from flask import Flask, Response, render_template, jsonify
-from time import sleep
+import cv2
+import sys
 
 HOST = '0.0.0.0'
 PORT = '8000'
@@ -25,7 +26,8 @@ class VisionApp:
 			while True:
 				frame = self.camera.get_frame()
 				if frame is not None:
-					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
+					encodedImage = cv2.imencode('.jpg', frame)[1]
+					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 		####################  ROUTES  ####################
 		
@@ -59,5 +61,9 @@ class VisionApp:
 
 
 if __name__ == '__main__':
+	if len(sys.argv) > 0 and sys.argv[1] == 'local':
+		print('Displaying feed locally')
+		# FIXME ADAM - Add function to not start flask app
+	else:
 		app = VisionApp()
 		app.run()
