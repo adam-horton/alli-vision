@@ -20,14 +20,7 @@ class VisionApp:
 			self.app.add_url_rule('/chomp', view_func=self.chomp)
 
 		def run(self):
-			self.app.run(host=HOST, port=PORT, use_reloader=False)
-
-		def generate_feed(self):
-			while True:
-				frame = self.camera.get_frame()
-				if frame is not None:
-					encodedImage = cv2.imencode('.jpg', frame)[1]
-					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+			self.app.run(host=HOST, port=PORT, use_reloader=False)	
 
 		####################  ROUTES  ####################
 		
@@ -35,7 +28,7 @@ class VisionApp:
 			return render_template('index.html')
 
 		def video_feed(self):
-			return Response(self.generate_feed(), mimetype = 'multipart/x-mixed-replace; boundary=frame')
+			return Response(self.camera.get_feed(), mimetype = 'multipart/x-mixed-replace; boundary=frame')
 
 		def status(self):
 			if self.camera.left_hand_raised() and self.camera.right_hand_raised():
@@ -58,6 +51,10 @@ class VisionApp:
 			return jsonify({'status': status_text})
 
 		##################################################
+
+def local_feed():
+	# Show video locally instead of via flask app
+	pass
 
 
 if __name__ == '__main__':
