@@ -58,7 +58,7 @@ def local_feed():
 
 
 if __name__ == '__main__':
-	if len(sys.argv) > 0 and sys.argv[1] == 'local':
+	if len(sys.argv) > 1 and sys.argv[1] == 'local':
 		print('Displaying feed locally')
 		# FIXME ADAM - Add function to not start flask app
 	else:
