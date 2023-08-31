@@ -54,8 +54,8 @@ class Camera:
 
 		cap = cv2.VideoCapture(0)
 		
-		while(cap.isOpened()):
-			with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+		with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+			while(cap.isOpened()):
 				#Read in one frame
 				ret, frame = cap.read()
 
