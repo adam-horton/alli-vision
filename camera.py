@@ -47,7 +47,7 @@ class Camera:
 			
 	################################################################
 
-	def get_feed(self, local=False):
+	def get_feed(self):
 		mp_drawing = mp.solutions.drawing_utils
 		mp_pose = mp.solutions.pose
 
@@ -83,14 +83,9 @@ class Camera:
 						mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
 						)
 				
-				#Send the frame to the live stream (or display locally)
-				if local:
-					cv2.imshow('Frame', image)
-					if cv2.waitKey(10) & 0xFF == ord('q'):
-						break
-				else:
-					encodedImage = cv2.imencode('.jpg', image)[1]
-					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+				#Send the frame to the live stream
+				encodedImage = cv2.imencode('.jpg', image)[1]
+				yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 		cap.release()
 		cv2.destroyAllWindows()
