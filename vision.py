@@ -24,7 +24,7 @@ class VisionApp:
 		def generate_feed(self):
 			while True:
 				frame = self.camera.get_frame()
-				if frame:
+				if frame is not None:
 					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
 
 		####################  ROUTES  ####################
