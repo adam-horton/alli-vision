@@ -53,14 +53,14 @@ class VisionApp:
 		##################################################
 
 def local_feed():
-	# Show video locally instead of via flask app
-	pass
+	cam = Camera()
+	cam.get_feed(local=True)
 
 
 if __name__ == '__main__':
 	if len(sys.argv) > 1 and sys.argv[1] == 'local':
 		print('Displaying feed locally')
-		# FIXME ADAM - Add function to not start flask app
+		local_feed()
 	else:
 		app = VisionApp()
 		app.run()
