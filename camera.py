@@ -47,91 +47,75 @@ class Camera:
 			
 	################################################################
 
-	def get_feed(self):
+	def capture_and_analyze(self, cap, pose):
 		mp_drawing = mp.solutions.drawing_utils
+
+		#Read in one frame
+		ret, frame = cap.read()
+
+		if not ret:
+			return None
+
+		# Use mediapipe pose to process the image and determine landmarks
+		image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+		image.flags.writeable = False
+		results = pose.process(image)
+		image.flags.writeable = True
+		image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+		try:
+			landmarks = results.pose_landmarks.landmark
+			self.update_status(landmarks)
+		except:
+			pass
+
+		#Draw the landmarks on the image
+		mp_drawing.draw_landmarks(
+				image,
+				results.pose_landmarks,
+				mp.solutions.pose.POSE_CONNECTIONS,
+				mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
+				mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
+				)
+		
+		return image
+
+
+	def get_feed(self):
 		mp_pose = mp.solutions.pose
 
 		cap = cv2.VideoCapture(0)
 		
 		with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
 			while(cap.isOpened()):
-				#Read in one frame
-				ret, frame = cap.read()
-
-				if not ret:
-					continue
-
-				# Use mediapipe pose to process the image and determine landmarks
-				image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-				image.flags.writeable = False
-				results = pose.process(image)
-				image.flags.writeable = True
-				image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-				try:
-					landmarks = results.pose_landmarks.landmark
-					self.update_status(landmarks)
-				except:
-					pass
-
-				#Draw the landmarks on the image
-				mp_drawing.draw_landmarks(
-						image,
-						results.pose_landmarks,
-						mp_pose.POSE_CONNECTIONS,
-						mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
-						mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
-						)
+				
+				image = self.capture_and_analyze(cap, pose)
 				
 				#Send the frame to the live stream
-				encodedImage = cv2.imencode('.jpg', image)[1]
-				yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+				if image is not None:
+					encodedImage = cv2.imencode('.jpg', image)[1]
+					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 		cap.release()
 		cv2.destroyAllWindows()
 
 	def display_live_feed(self):
-		mp_drawing = mp.solutions.drawing_utils
 		mp_pose = mp.solutions.pose
 
 		cap = cv2.VideoCapture(0)
 		
 		with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
 			while(cap.isOpened()):
-				#Read in one frame
-				ret, frame = cap.read()
-
-				if not ret:
-					continue
-
-				# Use mediapipe pose to process the image and determine landmarks
-				image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-				image.flags.writeable = False
-				results = pose.process(image)
-				image.flags.writeable = True
-				image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-				try:
-					landmarks = results.pose_landmarks.landmark
-					self.update_status(landmarks)
-				except:
-					pass
-
-				#Draw the landmarks on the image
-				mp_drawing.draw_landmarks(
-						image,
-						results.pose_landmarks,
-						mp_pose.POSE_CONNECTIONS,
-						mp_drawing.DrawingSpec(color=GATOR_ORANGE_BGR),
-						mp_drawing.DrawingSpec(color=GATOR_BLUE_BGR)
-						)
 				
-				#Show the current image
-				cv2.imshow('Alli Feed',image)
- 
-				# Press Q on keyboard to exit
-				if cv2.waitKey(1) & 0xFF == ord('q'):
-					break
+				image = self.capture_and_analyze(cap, pose)
+				
+				if image is not None:
+					#Show the current image
+					cv2.imshow('Alli Feed', image)
+	
+					# Press Q on keyboard to exit
+					if cv2.waitKey(1) & 0xFF == ord('q'):
+						break
 
 		cap.release()
 		cv2.destroyAllWindows()
