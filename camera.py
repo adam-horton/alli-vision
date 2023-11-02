@@ -133,7 +133,7 @@ class Camera:
 			chomp_difference = (current_chomp_frame[0] - self.previous_chomp_frame[0], current_chomp_frame[1] - self.previous_chomp_frame[1])
 
 			if ((chomp_difference[0] > 0 and chomp_difference[1] < 0) or (chomp_difference[0] < 0 and chomp_difference[1] > 0)) \
-				and (current_chomp_frame[1] > current_chomp_frame[0]):
+				and (current_chomp_frame[1] < current_chomp_frame[0]):
 				self.valid_chomp_count += 1
 				self.valid_chomp_frames[self.chomp_index] = True
 			else:
