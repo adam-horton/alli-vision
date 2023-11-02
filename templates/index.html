@@ -5,8 +5,8 @@
   <body>
     <h1>Alli Video Feed</h1>
     <img src="{{ url_for('video_feed') }}">
-    <div>Hand Status: <span style="font-size: 10vw" id="status"></span></div>
-    <div>Chomp Status: <span style="font-size: 10vw" id="chomp"></span></div>
+    <div style="font-size: 3vw">Hand Status: <span style="font-size: 3vw" id="status"></span></div>
+    <div style="font-size: 3vw">Chomp Status: <span style="font-size: 3vw" id="chomp"></span></div>
     <script>
       async function getStatus() {
         const post = await fetch(window.location.href + "/status").then((res) => res.json());
