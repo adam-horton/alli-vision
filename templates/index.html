@@ -1,22 +1,55 @@
 <html>
   <head>
     <title>Alli Video Feed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   </head>
   <body>
-    <h1>Alli Video Feed</h1>
-    <img src="{{ url_for('video_feed') }}">
-    <div style="font-size: 3vw">Hand Status: <span style="font-size: 3vw" id="status"></span></div>
-    <div style="font-size: 3vw">Chomp Status: <span style="font-size: 3vw" id="chomp"></span></div>
+    <header>
+      <h1>Alli's Eyes</h1>
+    </header>
+
+    <div class="container">
+      <div class="image-container-vertical">
+          <div class="image-container-horizontal">
+            <img id="left" src="{{ url_for('static', filename='icons/left-hand.png')}}" alt="Left Hand Icon">
+            <img id="right" src="{{ url_for('static', filename='icons/right-hand.png')}}" alt="Right Hand Icon">
+          </div>
+          <img id="chomp" src="{{ url_for('static', filename='icons/chomp.png')}}" alt="Chomp Icon">
+          <div class="subtext">Alli's Analysis</div>
+      </div>
+      <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+    </div>
+
     <script>
       async function getStatus() {
         const post = await fetch(window.location.href + "/status").then((res) => res.json());
-        document.getElementById("status").innerText = post.status;
+        if(post.status == "Both Hands Raised"){
+          document.getElementById("left").style.opacity = 1;
+          document.getElementById("right").style.opacity = 1;
+        }
+        else if(post.status == "Left Hand Raised"){
+          document.getElementById("left").style.opacity = 1;
+          document.getElementById("right").style.opacity = 0.1;
+        }
+        else if(post.status == "Right Hand Raised"){
+          document.getElementById("left").style.opacity = 0.1;
+          document.getElementById("right").style.opacity = 1;
+        }
+        else{
+          document.getElementById("left").style.opacity = 0.1;
+          document.getElementById("right").style.opacity = 0.1;
+        }
       }
       async function getChomp() {
         const post = await fetch(window.location.href + "/chomp").then((res) => res.json());
-        document.getElementById("chomp").innerText = post.status;
+        if(post.status == 'Chomping'){
+          document.getElementById("chomp").style.opacity = 1;
+        }
+        else{
+          document.getElementById("chomp").style.opacity = 0.1;
+        }
       }
-      window.setInterval(function(){getStatus();getChomp();}, 1000);
+      window.setInterval(function(){getStatus();getChomp();}, 500);
     </script>
   </body>
 </html>

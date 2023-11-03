@@ -17,6 +17,7 @@ class VisionApp:
 			self.app.add_url_rule('/video_feed', view_func=self.video_feed)
 			self.app.add_url_rule('/status', view_func=self.status)
 			self.app.add_url_rule('/chomp', view_func=self.chomp)
+			self.app.add_url_rule('/sources', view_func=self.sources)
 
 		def run(self):
 			self.app.run(host=HOST, port=PORT, use_reloader=False)
@@ -28,6 +29,9 @@ class VisionApp:
 		
 		def index(self):
 			return render_template('index.html')
+
+		def sources(self):
+			return render_template('sources.html')
 
 		def video_feed(self):
 			return Response(self.camera.get_feed(), mimetype = 'multipart/x-mixed-replace; boundary=frame')
