@@ -61,7 +61,7 @@ class VisionApp:
 
 if __name__ == '__main__':
 	app = VisionApp()
-	if len(sys.argv) > 1 and sys.argv[1] == 'local':
+	if len(sys.argv) > 1 and sys.argv[1] == 'dev':
 		print('Displaying feed locally')
 		app.local_feed()
 	else:
