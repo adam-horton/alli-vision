@@ -2,9 +2,6 @@
 import mediapipe as mp
 import cv2
 import math
-import ssl
-import websockets
-
 
 #################### PARAMETERS ####################
 
@@ -50,7 +47,7 @@ class Camera:
 			
 	################################################################
 
-	def capture_and_analyze(self, cap, pose, websocket):
+	def capture_and_analyze(self, cap, pose):
 		mp_drawing = mp.solutions.drawing_utils
 
 		#Read in one frame
@@ -68,7 +65,7 @@ class Camera:
 
 		try:
 			landmarks = results.pose_landmarks.landmark
-			self.update_status(landmarks, websocket)
+			self.update_status(landmarks)
 		except:
 			pass
 
@@ -91,18 +88,14 @@ class Camera:
 		
 		with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
 
-			ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-			ssl_context.check_hostname = False  # Disable hostname verification
-			with websockets.connect(SERVER_URL, ssl=ssl_context) as websocket:
-				print("Connected to Server")
-				while(cap.isOpened()):
-					
-					image = self.capture_and_analyze(cap, pose, websocket)
-					
-					#Send the frame to the live stream
-					if image is not None:
-						encodedImage = cv2.imencode('.jpg', image)[1]
-						yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+			while(cap.isOpened()):
+				
+				image = self.capture_and_analyze(cap, pose)
+				
+				#Send the frame to the live stream
+				if image is not None:
+					encodedImage = cv2.imencode('.jpg', image)[1]
+					yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 		cap.release()
 		cv2.destroyAllWindows()
@@ -113,27 +106,23 @@ class Camera:
 		cap = cv2.VideoCapture(0)
 		
 		with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-			ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-			ssl_context.check_hostname = False  # Disable hostname verification
-			with websockets.connect(SERVER_URL, ssl=ssl_context) as websocket:
-				print("Connected to Server")
-				while(cap.isOpened()):
-					
-					image = self.capture_and_analyze(cap, pose, websocket)
-					
-					if image is not None:
-						#Show the current image
-						cv2.imshow('Alli Feed', image)
-		
-						# Press Q on keyboard to exit
-						if cv2.waitKey(1) & 0xFF == ord('q'):
-							break
+			while(cap.isOpened()):
+				
+				image = self.capture_and_analyze(cap, pose)
+				
+				if image is not None:
+					#Show the current image
+					cv2.imshow('Alli Feed', image)
+	
+					# Press Q on keyboard to exit
+					if cv2.waitKey(1) & 0xFF == ord('q'):
+						break
 
 		cap.release()
 		cv2.destroyAllWindows()
 
 
-	def update_status(self, landmarks, websocket):
+	def update_status(self, landmarks):
 		mp_landmark = mp.solutions.pose.PoseLandmark
 
 		# Chomping Logic:
@@ -171,8 +160,6 @@ class Camera:
 			self.hand_status['RIGHT_HAND_RAISED'] = True
 		else:
 			self.hand_status['RIGHT_HAND_RAISED'] = False
-
-		websocket.send('Message') # Some logic needs to be implemented here to send the correct message to the web app
 
 
 if __name__ == "__main__":
