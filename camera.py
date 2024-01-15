@@ -18,7 +18,7 @@ MIN_CHOMP_CONFIDENCE = .8			# Minimum confidence required to detect user chompin
 CHOMP_ERROR = math.floor(round(CHOMP_WINDOW * (1-MIN_CHOMP_CONFIDENCE), 5))
 GATOR_BLUE_BGR = (165, 33, 0)				# Gator Blue Color
 GATOR_ORANGE_BGR = (22, 70, 250)			# Gator Orange Color
-SERVER_URL = "ws://192.168.1.183:6003"		# Must be changed to instance of web application
+SERVER_URL = "WEB APPLICATION ADDRESS "		# MUST BE SETUP BEFORE RUNNING example: "ws://123.234.101.202:6003"
 
 #########################################################
 
@@ -97,7 +97,7 @@ class Camera:
 				print("Connected to Server")
 				while(cap.isOpened()):
 					
-					image = self.capture_and_analyze(cap, pose)
+					image = self.capture_and_analyze(cap, pose, websocket)
 					
 					#Send the frame to the live stream
 					if image is not None:
@@ -172,7 +172,7 @@ class Camera:
 		else:
 			self.hand_status['RIGHT_HAND_RAISED'] = False
 
-		websocket.send('Message')
+		websocket.send('Message') # Some logic needs to be implemented here to send the correct message to the web app
 
 
 if __name__ == "__main__":
